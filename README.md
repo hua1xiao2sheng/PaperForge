@@ -1,19 +1,160 @@
 # PaperForge
 
-> From venue selection to submission: conference templates, deadlines, structured paper writing, and AI-assisted research workflows in one workspace.
+> From research idea to conference-ready submission: venue selection, evidence-grounded ideation, section-by-section writing, multi-perspective review, and submission checks in one workspace.
 
-PaperForge is a conference-aware paper-writing workspace for computer science research. The current MVP focuses on CCF A/B venues across AI, machine learning, software engineering, databases, and data mining.
+PaperForge is a conference-aware AI research workspace for computer science papers.
 
-## What the MVP already does
+It is intentionally **not** a one-click “generate my paper” tool. The workflow keeps research decisions visible:
 
-- Filter target venues by CCF tier and research area.
-- Show venue-aware template links and submission metadata.
-- Model separate abstract / full-paper deadlines and multi-round submission cycles.
-- Keep unannounced future deadlines as **TBA** instead of guessing.
-- Switch writing outlines by research area.
-- Draft papers section by section with local autosave.
-- Export the current draft as a basic LaTeX document.
-- Reserve API settings for OpenAI / Anthropic / Gemini / DeepSeek / OpenRouter without committing secrets.
+```text
+Project → Idea Lab → Literature → Writing → Review → Submission
+```
+
+## Current MVP
+
+### 1. Project & venue
+
+- CCF 7th edition (2026) A/B venue catalog for AI, ML, software engineering, databases, and data mining.
+- 69 A/B conference entries across the relevant CCF domains.
+- Venue/template family metadata.
+- Official author-kit/template source links.
+- Conservative deadline model: unknown future dates remain `TBA`.
+
+### 2. Idea Lab
+
+A persistent `IdeaSpec` captures:
+
+- problem;
+- research gap;
+- core mechanism;
+- falsifiable hypothesis;
+- provisional novelty claim;
+- contributions;
+- technical route;
+- decisive experiments;
+- baselines;
+- data/environment;
+- success/failure criteria;
+- risks;
+- assumptions.
+
+The **Innovation Council** runs independent method lenses inspired by widely used open research projects, then a separate meta-critic synthesizes the reports. Agreement is not treated as proof of novelty.
+
+### 3. Literature & evidence
+
+- Perspective-guided search-query generation.
+- Semantic Scholar public search integration when available.
+- Manual evidence entry.
+- Evidence roles: `support`, `challenge`, `context`.
+- Claim-to-evidence links and researcher notes.
+- No “zero search results = novel” shortcut.
+
+### 4. Writing
+
+- Area-aware section structures.
+- Write one section at a time.
+- Local autosave.
+- Section AI Copilot actions:
+  - analyze;
+  - outline;
+  - draft from IdeaSpec;
+  - rewrite;
+  - logic-gap review;
+  - citation audit;
+  - compression;
+  - reviewer view.
+- AI prompts explicitly prohibit fabricating citations, data, metrics, or experimental results.
+
+### 5. Review Room
+
+Independent specialist lenses:
+
+- novelty & positioning;
+- technical soundness;
+- experimental rigor;
+- evidence & citations;
+- narrative & clarity.
+
+A separate meta-review critiques both the paper **and the reviewers**, preserves disagreement, and produces a revision plan. PaperForge does not present AI review as an acceptance prediction.
+
+### 6. Submission Gate
+
+- Idea completeness.
+- Core section completeness.
+- Method/evaluation coverage.
+- Evidence matrix coverage.
+- Manual checks for:
+  - official author kit;
+  - deadline/timezone;
+  - anonymity;
+  - venue policy / AI disclosure;
+  - page limits / supplementary rules;
+  - citation existence and claim alignment.
+- Venue-aware `.tex` scaffold export.
+- Full PaperForge project JSON export.
+
+## AI providers
+
+The MVP includes an adapter for:
+
+- OpenAI
+- Anthropic
+- Gemini
+- DeepSeek
+- OpenRouter
+
+API keys are blank by default.
+
+The current prototype stores a supplied key in browser `sessionStorage` only. It is **not** written to GitHub or the persistent PaperForge workspace.
+
+For a production deployment, route all model calls through a backend and keep secrets server-side.
+
+Without an API key, PaperForge remains usable in **offline scaffold mode** with deterministic research-process checks.
+
+## LaTeX templates
+
+`templates/` contains starter scaffolds for:
+
+- ACM
+- IEEE
+- AAAI
+- ACL
+- Springer LNCS
+- USENIX
+- Generic LaTeX
+
+These are intentionally not redistributed conference author-kit bundles. Always download the current official class/style files from the venue before submission.
+
+## Method inspiration
+
+PaperForge independently implements workflow ideas inspired by high-adoption open research projects, including:
+
+- Karpathy Autoresearch
+- K-Dense Scientific Agent Skills
+- Stanford STORM / Co-STORM
+- GPT Researcher
+- Microsoft R&D-Agent
+- Orchestra AI Research SKILLs
+- FutureHouse PaperQA2
+- Sakana AI Scientist family
+
+See [docs/INSPIRATION.md](docs/INSPIRATION.md) for the exact division of responsibilities and licensing boundary.
+
+The core principle is:
+
+```text
+independent perspectives
+        ↓
+explicit objections and missing evidence
+        ↓
+critical meta-analysis
+        ↓
+smallest defensible consensus claim
+        ↓
+literature + experiment gates
+```
+
+Consensus is a decision aid, not scientific proof.
 
 ## Run locally
 
@@ -28,21 +169,37 @@ Build:
 npm run build
 ```
 
-## Data notes
+## Important files
 
-The venue catalog is based on the CCF 7th edition directory released in 2026. CCF itself states that the directory is a recommendation list and should not be treated as a direct evaluation of individual papers.
+```text
+src/
+  App.tsx                    # end-to-end UI/workflow
+  data/
+    conferences.ts           # CCF venue catalog + outlines
+    researchMethods.ts       # project-inspired method lenses
+  lib/
+    ai.ts                    # multi-provider model adapter
+    research.ts              # Idea/Literature/Writing/Review logic
 
-Deadline data is intentionally conservative: only dates backed by an official venue page are marked as official. If the next cycle has not been announced, PaperForge shows **TBA**.
+templates/                  # LaTeX starter scaffolds
+docs/
+  INSPIRATION.md            # upstream methods & design rationale
+  WORKFLOW.md               # PaperForge workflow specification
+```
 
-## Security
+## Research integrity defaults
 
-Never commit real API keys. `.env.example` only contains empty placeholders. A production version should proxy model calls through a backend and store provider secrets server-side.
+PaperForge is designed to keep these distinctions explicit:
 
-## Planned next steps
+- idea ≠ finding;
+- search gap ≠ proof of novelty;
+- reviewer agreement ≠ truth;
+- AI review ≠ editorial decision;
+- generated citation ≠ verified citation;
+- LaTeX scaffold ≠ current official author kit.
 
-1. Add an automated venue/deadline refresh service.
-2. Add a real multi-file LaTeX project model with BibTeX, figures and tables.
-3. Add Overleaf/GitHub sync.
-4. Add literature search and citation evidence tracking.
-5. Add AI-assisted outlining, paragraph drafting and reviewer simulation.
-6. Add submission-readiness checks for anonymity, formatting, references and page limits.
+## Data note
+
+The venue catalog follows the CCF 7th edition released in 2026. CCF describes the catalog as a recommended list and cautions against using it as a direct evaluation of individual academic work.
+
+See [docs/WORKFLOW.md](docs/WORKFLOW.md) for the full system flow.
