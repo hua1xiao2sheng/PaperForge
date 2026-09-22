@@ -4,9 +4,17 @@ from typing import Any, Literal
 
 import httpx
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI(title="PaperForge AI Gateway", version="0.1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.getenv("PAPERFORGE_FRONTEND_ORIGIN", "http://localhost:5173")],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Provider = Literal["openai", "deepseek", "openrouter"]
 
