@@ -1,160 +1,128 @@
 # PaperForge
 
-> From research idea to conference-ready submission: venue selection, evidence-grounded ideation, section-by-section writing, multi-perspective review, and submission checks in one workspace.
+> From research idea to conference submission: venue-aware templates, deadlines, evidence-grounded writing, multi-agent innovation review, section-level AI assistance and submission checks.
 
-PaperForge is a conference-aware AI research workspace for computer science papers.
+PaperForge is an end-to-end research-paper workspace for computer science. It combines conference selection, idea analysis, literature evidence, section-by-section writing, reviewer simulation and submission preparation in one interface.
 
-It is intentionally **not** a one-click “generate my paper” tool. The workflow keeps research decisions visible:
-
-```text
-Project → Idea Lab → Literature → Writing → Review → Submission
-```
-
-## Current MVP
-
-### 1. Project & venue
-
-- CCF 7th edition (2026) A/B venue catalog for AI, ML, software engineering, databases, and data mining.
-- 69 A/B conference entries across the relevant CCF domains.
-- Venue/template family metadata.
-- Official author-kit/template source links.
-- Conservative deadline model: unknown future dates remain `TBA`.
-
-### 2. Idea Lab
-
-A persistent `IdeaSpec` captures:
-
-- problem;
-- research gap;
-- core mechanism;
-- falsifiable hypothesis;
-- provisional novelty claim;
-- contributions;
-- technical route;
-- decisive experiments;
-- baselines;
-- data/environment;
-- success/failure criteria;
-- risks;
-- assumptions.
-
-The **Innovation Council** runs independent method lenses inspired by widely used open research projects, then a separate meta-critic synthesizes the reports. Agreement is not treated as proof of novelty.
-
-### 3. Literature & evidence
-
-- Perspective-guided search-query generation.
-- Semantic Scholar public search integration when available.
-- Manual evidence entry.
-- Evidence roles: `support`, `challenge`, `context`.
-- Claim-to-evidence links and researcher notes.
-- No “zero search results = novel” shortcut.
-
-### 4. Writing
-
-- Area-aware section structures.
-- Write one section at a time.
-- Local autosave.
-- Section AI Copilot actions:
-  - analyze;
-  - outline;
-  - draft from IdeaSpec;
-  - rewrite;
-  - logic-gap review;
-  - citation audit;
-  - compression;
-  - reviewer view.
-- AI prompts explicitly prohibit fabricating citations, data, metrics, or experimental results.
-
-### 5. Review Room
-
-Independent specialist lenses:
-
-- novelty & positioning;
-- technical soundness;
-- experimental rigor;
-- evidence & citations;
-- narrative & clarity.
-
-A separate meta-review critiques both the paper **and the reviewers**, preserves disagreement, and produces a revision plan. PaperForge does not present AI review as an acceptance prediction.
-
-### 6. Submission Gate
-
-- Idea completeness.
-- Core section completeness.
-- Method/evaluation coverage.
-- Evidence matrix coverage.
-- Manual checks for:
-  - official author kit;
-  - deadline/timezone;
-  - anonymity;
-  - venue policy / AI disclosure;
-  - page limits / supplementary rules;
-  - citation existence and claim alignment.
-- Venue-aware `.tex` scaffold export.
-- Full PaperForge project JSON export.
-
-## AI providers
-
-The MVP includes an adapter for:
-
-- OpenAI
-- Anthropic
-- Gemini
-- DeepSeek
-- OpenRouter
-
-API keys are blank by default.
-
-The current prototype stores a supplied key in browser `sessionStorage` only. It is **not** written to GitHub or the persistent PaperForge workspace.
-
-For a production deployment, route all model calls through a backend and keep secrets server-side.
-
-Without an API key, PaperForge remains usable in **offline scaffold mode** with deterministic research-process checks.
-
-## LaTeX templates
-
-`templates/` contains starter scaffolds for:
-
-- ACM
-- IEEE
-- AAAI
-- ACL
-- Springer LNCS
-- USENIX
-- Generic LaTeX
-
-These are intentionally not redistributed conference author-kit bundles. Always download the current official class/style files from the venue before submission.
-
-## Method inspiration
-
-PaperForge independently implements workflow ideas inspired by high-adoption open research projects, including:
-
-- Karpathy Autoresearch
-- K-Dense Scientific Agent Skills
-- Stanford STORM / Co-STORM
-- GPT Researcher
-- Microsoft R&D-Agent
-- Orchestra AI Research SKILLs
-- FutureHouse PaperQA2
-- Sakana AI Scientist family
-
-See [docs/INSPIRATION.md](docs/INSPIRATION.md) for the exact division of responsibilities and licensing boundary.
-
-The core principle is:
+## Current workflow
 
 ```text
-independent perspectives
-        ↓
-explicit objections and missing evidence
-        ↓
-critical meta-analysis
-        ↓
-smallest defensible consensus claim
-        ↓
-literature + experiment gates
+Choose venue
+→ Idea Lab
+→ Innovation Council
+→ Adopt IdeaSpec
+→ Literature / Evidence
+→ Write section by section
+→ Section AI Copilot
+→ Multi-reviewer Review Room
+→ Revision priorities
+→ Submission Gate
+→ Export LaTeX
 ```
 
-Consensus is a decision aid, not scientific proof.
+## What is implemented
+
+### Venue-aware project setup
+
+- CCF A/B venue browser for AI, ML, software engineering, databases and data mining.
+- Official author-kit / template links.
+- Abstract / full-paper deadline data model.
+- TBA instead of invented future deadlines.
+- Conference-aware section outlines.
+- ACM / IEEE / Springer / AAAI / ACL / USENIX / Custom LaTeX skeleton presets.
+
+### Idea Lab
+
+The Innovation Council combines independent research perspectives inspired by mature open-source systems:
+
+- AI Scientist — idea reflection, experimental falsifiability and reviewer-style criticism.
+- STORM / Co-STORM — multi-perspective questioning and moderator synthesis.
+- GPT Researcher — research decomposition and broad evidence gathering.
+- PaperQA — citation-grounded scientific evidence.
+- Scientific Agent Skills — procedural reproducibility and versioned skills.
+- AutoGen-style orchestration — explicit multi-agent roles and moderated synthesis.
+
+The moderator does **not** simply vote. It keeps consensus, disagreement and required next actions separate.
+
+The result can be adopted as an `IdeaSpec` containing:
+
+- problem
+- gap
+- mechanism
+- novelty candidates
+- contributions
+- experiment plan
+- risks
+- evidence requirements
+
+### Section-by-section Writing
+
+Each paper section is written separately and autosaved in the browser.
+
+The Section AI Copilot can analyze:
+
+- recommended section structure
+- logic gaps
+- IdeaSpec alignment
+- reviewer-style attacks
+
+The built-in local engine works without any API key.
+
+### Literature / Evidence Workspace
+
+The evidence workflow is organized as:
+
+```text
+Research question
+→ perspective questions
+→ search tasks
+→ candidate papers
+→ claim-level evidence
+→ contradictions
+→ synthesis
+```
+
+The design intentionally stores evidence by **claim**, not only by paper.
+
+### Review Room
+
+Three independent reviewer roles are currently modeled:
+
+- Reviewer A — novelty and significance
+- Reviewer B — technical soundness and experiments
+- Reviewer C — clarity and reproducibility
+
+An Area-Chair-style synthesis converts weaknesses into P0/P1 revision tasks and links them back to the relevant writing section.
+
+### Submission Gate
+
+Current checks include:
+
+- section completeness
+- abstract/body consistency
+- novelty claims with evidence
+- strong baselines and ablations
+- anonymity
+- page-limit / supplementary rules
+- figures, tables and references
+- official template / CFP links
+
+### AI backend contract
+
+Real provider keys should **not** be exposed in browser code.
+
+`src/lib/aiClient.ts` defines a server-side workflow API. Configure:
+
+```bash
+VITE_AI_BACKEND_URL=http://localhost:8000
+```
+
+When the backend is absent, PaperForge falls back to the deterministic local research engine.
+
+See:
+
+- `docs/research-workflow.md`
+- `docs/backend-api.md`
 
 ## Run locally
 
@@ -169,37 +137,27 @@ Build:
 npm run build
 ```
 
-## Important files
+GitHub Actions also runs a frontend build check on pushes and pull requests.
 
-```text
-src/
-  App.tsx                    # end-to-end UI/workflow
-  data/
-    conferences.ts           # CCF venue catalog + outlines
-    researchMethods.ts       # project-inspired method lenses
-  lib/
-    ai.ts                    # multi-provider model adapter
-    research.ts              # Idea/Literature/Writing/Review logic
+## Research workflow inspirations
 
-templates/                  # LaTeX starter scaffolds
-docs/
-  INSPIRATION.md            # upstream methods & design rationale
-  WORKFLOW.md               # PaperForge workflow specification
-```
+PaperForge independently re-implements workflow ideas; it does not copy or vendor source code from these projects.
 
-## Research integrity defaults
+- [SakanaAI/AI-Scientist](https://github.com/SakanaAI/AI-Scientist)
+- [stanford-oval/storm](https://github.com/stanford-oval/storm)
+- [assafelovic/gpt-researcher](https://github.com/assafelovic/gpt-researcher)
+- [Future-House/paper-qa](https://github.com/Future-House/paper-qa)
+- [microsoft/autogen](https://github.com/microsoft/autogen)
+- [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)
 
-PaperForge is designed to keep these distinctions explicit:
+## Security
 
-- idea ≠ finding;
-- search gap ≠ proof of novelty;
-- reviewer agreement ≠ truth;
-- AI review ≠ editorial decision;
-- generated citation ≠ verified citation;
-- LaTeX scaffold ≠ current official author kit.
+- Never commit real API keys.
+- Prefer a backend provider gateway.
+- Keep citation evidence traceable.
+- Preserve disagreement in multi-agent review.
+- Human verification is required before paper submission.
 
-## Data note
+## Important scope note
 
-The venue catalog follows the CCF 7th edition released in 2026. CCF describes the catalog as a recommended list and cautions against using it as a direct evaluation of individual academic work.
-
-See [docs/WORKFLOW.md](docs/WORKFLOW.md) for the full system flow.
+The current frontend contains a complete **workflow shell and deterministic local research logic**. Live model calls, real literature search, PDF ingestion, citation retrieval and true multi-model parallel review require the backend/search connectors described in the docs. The UI and data contracts are already prepared for those integrations.
