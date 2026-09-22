@@ -32,6 +32,18 @@ export const templatePresets: Record<Conference['templateFamily'], TemplatePrese
     preamble: ['% Load the official AAAI style file from the author kit.', '\\usepackage{graphicx}', '\\usepackage{amsmath}', '\\usepackage{booktabs}'],
     notes: ['AAAI formatting changes by edition; always download the current author kit.']
   },
+  ACL: {
+    family: 'ACL',
+    className: '\\\\documentclass[11pt]{article}',
+    preamble: ['% Load the current ACL style file from the official author kit.', '\\\\usepackage{graphicx}', '\\\\usepackage{amsmath}', '\\\\usepackage{booktabs}'],
+    notes: ['Use the current ACLPUB template and track-specific anonymity rules.']
+  },
+  USENIX: {
+    family: 'USENIX',
+    className: '\\\\documentclass[letterpaper,twocolumn,10pt]{article}',
+    preamble: ['% Load the official USENIX style package from the venue author kit.', '\\\\usepackage{graphicx}', '\\\\usepackage{booktabs}', '\\\\usepackage{hyperref}'],
+    notes: ['Use the venue-specific USENIX style package and current artifact/anonymity rules.']
+  },
   Custom: {
     family: 'Custom',
     className: '\\documentclass{article}',
