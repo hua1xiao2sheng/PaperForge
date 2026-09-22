@@ -126,10 +126,33 @@ See:
 
 ## Run locally
 
+Frontend:
+
 ```bash
 npm install
 npm run dev
 ```
+
+Optional real-AI backend:
+
+```bash
+cd backend
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+cp .env.example .env
+# fill one server-side provider key in your environment
+uvicorn main:app --reload --port 8000
+```
+
+Then set the frontend environment:
+
+```bash
+VITE_AI_BACKEND_URL=http://localhost:8000
+```
+
+Without the backend or keys, the interface automatically uses the local deterministic research engine.
 
 Build:
 
