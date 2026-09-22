@@ -682,3 +682,11 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font-family: in
   .source-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .review-grid { grid-template-columns:1fr; }
 }
+
+
+.deadline-values { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+.deadline-values p { margin: 0; padding: 7px; border-radius: 8px; background: #111a2a; }
+.deadline-values p span { display: block; color: #637087; font-size: 8px; text-transform: uppercase; letter-spacing: .08em; }
+.deadline-values p b { display: block; margin-top: 3px; color: #aab6c8; font-size: 9px; font-weight: 700; }
+.deadline-source { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; color: #7f90ff; font-size: 8px; }
+.deadline-source:hover { color: #b3beff; }
