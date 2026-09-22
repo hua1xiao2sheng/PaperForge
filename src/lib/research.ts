@@ -480,7 +480,7 @@ export function buildLatex(
   const sections = outline.map((name) => {
     const text = drafts[conference.id + ':' + name] || ''
     if (name === 'Abstract') return '\\begin{abstract}\n' + text + '\n\\end{abstract}'
-    return '\\section{' + name.replaceAll('&', '\\&') + '}\n' + text
+    return '\\section{' + name.replace(/&/g, '\\&') + '}\n' + text
   })
 
   return [
@@ -489,7 +489,7 @@ export function buildLatex(
     '% ' + conference.templateUrl,
     header,
     '\\usepackage{hyperref}',
-    '\\title{' + (idea.title || 'Untitled Paper').replaceAll('&', '\\&') + '}',
+    '\\title{' + (idea.title || 'Untitled Paper').replace(/&/g, '\\&') + '}',
     '\\author{Anonymous Authors}',
     '\\begin{document}',
     '\\maketitle',
