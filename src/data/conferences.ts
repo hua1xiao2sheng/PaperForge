@@ -17,7 +17,7 @@ export interface Conference {
   fullName: string
   tier: Tier
   areas: Area[]
-  templateFamily: 'IEEE' | 'ACM' | 'Springer' | 'Custom'
+  templateFamily: 'IEEE' | 'ACM' | 'Springer' | 'AAAI' | 'Custom'
   templateUrl: string
   cfpUrl: string
   deadlines: DeadlineCycle[]
@@ -25,7 +25,7 @@ export interface Conference {
 }
 
 export const conferences: Conference[] = [
-  { id:'aaai', name:'AAAI', fullName:'AAAI Conference on Artificial Intelligence', tier:'A', areas:['AI'], templateFamily:'AAAI' as any, templateUrl:'https://aaai.org/authorkit26/', cfpUrl:'https://aaai.org/conference/aaai/aaai-27/', deadlines:[{label:'Next cycle',status:'tba'}] },
+  { id:'aaai', name:'AAAI', fullName:'AAAI Conference on Artificial Intelligence', tier:'A', areas:['AI'], templateFamily:'AAAI', templateUrl:'https://aaai.org/authorkit26/', cfpUrl:'https://aaai.org/conference/aaai/aaai-27/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'ijcai', name:'IJCAI', fullName:'International Joint Conference on Artificial Intelligence', tier:'A', areas:['AI'], templateFamily:'Custom', templateUrl:'https://www.ijcai.org/authors_kit', cfpUrl:'https://www.ijcai.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'cvpr', name:'CVPR', fullName:'IEEE/CVF Conference on Computer Vision and Pattern Recognition', tier:'A', areas:['AI','ML'], templateFamily:'IEEE', templateUrl:'https://cvpr.thecvf.com/Conferences/2026/AuthorGuidelines', cfpUrl:'https://cvpr.thecvf.com/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'iccv', name:'ICCV', fullName:'IEEE/CVF International Conference on Computer Vision', tier:'A', areas:['AI','ML'], templateFamily:'IEEE', templateUrl:'https://iccv.thecvf.com/', cfpUrl:'https://iccv.thecvf.com/', deadlines:[{label:'Next cycle',status:'tba'}] },
@@ -37,7 +37,7 @@ export const conferences: Conference[] = [
   { id:'kdd', name:'KDD', fullName:'ACM SIGKDD Conference on Knowledge Discovery and Data Mining', tier:'A', areas:['Data Mining','ML'], templateFamily:'ACM', templateUrl:'https://www.acm.org/publications/proceedings-template', cfpUrl:'https://kdd.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'www', name:'WWW', fullName:'The Web Conference', tier:'A', areas:['Data Mining','AI'], templateFamily:'ACM', templateUrl:'https://www.acm.org/publications/proceedings-template', cfpUrl:'https://www2027.thewebconf.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'sigmod', name:'SIGMOD', fullName:'ACM SIGMOD International Conference on Management of Data', tier:'A', areas:['Database'], templateFamily:'ACM', templateUrl:'https://www.acm.org/publications/proceedings-template', cfpUrl:'https://2027.sigmod.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
-  { id:'vldb', name:'VLDB', fullName:'International Conference on Very Large Data Bases / PVLDB', tier:'A', areas:['Database'], templateFamily:'Custom', templateUrl:'https://www.vldb.org/pvldb/volumes/19/formatting/', cfpUrl:'https://www.vldb.org/', deadlines:[{label:'Rolling cycle',status:'tba',notes:'PVLDB often uses recurring monthly submission rounds.'} as any], notes:'PVLDB frequently uses rolling monthly rounds rather than one annual paper deadline.' },
+  { id:'vldb', name:'VLDB', fullName:'International Conference on Very Large Data Bases / PVLDB', tier:'A', areas:['Database'], templateFamily:'Custom', templateUrl:'https://www.vldb.org/pvldb/volumes/19/formatting/', cfpUrl:'https://www.vldb.org/', deadlines:[{label:'Rolling cycle',status:'tba'}], notes:'PVLDB frequently uses rolling monthly rounds rather than one annual paper deadline.' },
   { id:'icde', name:'ICDE', fullName:'IEEE International Conference on Data Engineering', tier:'A', areas:['Database'], templateFamily:'IEEE', templateUrl:'https://www.ieee.org/conferences/publishing/templates.html', cfpUrl:'https://icde2027.github.io/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'pods', name:'PODS', fullName:'ACM Symposium on Principles of Database Systems', tier:'B', areas:['Database'], templateFamily:'ACM', templateUrl:'https://www.acm.org/publications/proceedings-template', cfpUrl:'https://sigmod.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
   { id:'cikm', name:'CIKM', fullName:'ACM International Conference on Information and Knowledge Management', tier:'B', areas:['Data Mining','Database'], templateFamily:'ACM', templateUrl:'https://www.acm.org/publications/proceedings-template', cfpUrl:'https://www.cikmconference.org/', deadlines:[{label:'Next cycle',status:'tba'}] },
