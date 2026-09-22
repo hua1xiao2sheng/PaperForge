@@ -1159,8 +1159,16 @@ function RightContext(props: {
         {props.selected.deadlines.map((d, i) => (
           <div className="deadline-mini" key={i}>
             <div><strong>{d.label}</strong><span className={'status-pill ' + d.status}>{d.status.toUpperCase()}</span></div>
-            <p>{d.paper || d.abstract || 'Next date not yet verified in PaperForge.'}</p>
+            <div className="deadline-values">
+              <p><span>Abstract</span><b>{d.abstract || '—'}</b></p>
+              <p><span>Paper</span><b>{d.paper || '—'}</b></p>
+            </div>
             <small>{d.timezone || 'Verify timezone on the official CFP.'}</small>
+            {d.sourceUrl && (
+              <a className="deadline-source" href={d.sourceUrl} target="_blank" rel="noreferrer">
+                Official deadline source <ExternalLink size={11} />
+              </a>
+            )}
           </div>
         ))}
         <a className="context-link" href={props.selected.templateUrl} target="_blank" rel="noreferrer">
