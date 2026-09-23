@@ -118,6 +118,26 @@ export const emptyIdeaStudioState: IdeaStudioState = {
   searchQueries: [],
 }
 
+export function normalizeIdeaStudioState(input: unknown): IdeaStudioState {
+  const value = input && typeof input === 'object' ? input as Partial<IdeaStudioState> : {}
+  const brief = value.brief && typeof value.brief === 'object'
+    ? { ...emptyResearchBrief, ...value.brief }
+    : { ...emptyResearchBrief }
+
+  return {
+    ...emptyIdeaStudioState,
+    ...value,
+    brief,
+    messages: Array.isArray(value.messages) ? value.messages : [],
+    candidates: Array.isArray(value.candidates)
+      ? value.candidates.map((candidate, index) => normalizeCandidate(candidate, index))
+      : [],
+    critiques: Array.isArray(value.critiques) ? value.critiques : [],
+    findings: Array.isArray(value.findings) ? value.findings : [],
+    searchQueries: Array.isArray(value.searchQueries) ? value.searchQueries : [],
+  }
+}
+
 export function nowIso() {
   return new Date().toISOString()
 }
