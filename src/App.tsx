@@ -76,8 +76,13 @@ import {
 } from './lib/ai'
 import { IdeaStudioView } from './IdeaStudioView'
 import {
+  loadPaperForgeIdeaStudioState,
+  savePaperForgeIdeaStudioState,
+} from './lib/aiClient'
+import {
   candidateToIdeaSpec,
   emptyIdeaStudioState,
+  normalizeIdeaStudioState,
   type IdeaStudioState,
 } from './lib/ideaStudio'
 
@@ -85,6 +90,7 @@ type DraftMap = Record<string, string>
 type ManualChecks = Record<string, boolean>
 
 const STORAGE_KEY = 'paperforge:workspace:v3'
+const IDEA_STUDIO_WORKSPACE_ID = 'default'
 
 interface StoredWorkspace {
   selectedId?: string
@@ -147,6 +153,7 @@ function App() {
   }))
   const [evidence, setEvidence] = useState<EvidenceItem[]>(initial.evidence || [])
   const [manualChecks, setManualChecks] = useState<ManualChecks>(initial.manualChecks || {})
+  const [remoteStudioReady, setRemoteStudioReady] = useState(false)
 
   const [showSettings, setShowSettings] = useState(false)
   const [aiConfig, setAIConfig] = useState<AIConfig>(() => readSessionAIConfig())
@@ -195,6 +202,39 @@ function App() {
     const state: StoredWorkspace = { selectedId, idea, ideaStudio, drafts, evidence, section, manualChecks }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [selectedId, idea, ideaStudio, drafts, evidence, section, manualChecks])
+
+  useEffect(() => {
+    let cancelled = false
+    void loadPaperForgeIdeaStudioState<IdeaStudioState>(IDEA_STUDIO_WORKSPACE_ID).then((remote) => {
+      if (cancelled) return
+      const normalized = remote ? normalizeIdeaStudioState(remote) : null
+      const hasRemoteWork = Boolean(
+        normalized &&
+        (
+          normalized.messages.length ||
+          normalized.candidates.length ||
+          normalized.findings.length ||
+          normalized.brief.researchGoal.trim() ||
+          normalized.brief.assets.trim()
+        )
+      )
+      if (normalized && hasRemoteWork) {
+        setIdeaStudio(normalized)
+      }
+      setRemoteStudioReady(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!remoteStudioReady) return
+    const timer = window.setTimeout(() => {
+      void savePaperForgeIdeaStudioState(ideaStudio, IDEA_STUDIO_WORKSPACE_ID)
+    }, 800)
+    return () => window.clearTimeout(timer)
+  }, [ideaStudio, remoteStudioReady])
 
   const draftedSections = outline.filter((name) => (drafts[selected.id + ':' + name] || '').trim().length > 80).length
 
@@ -539,6 +579,7 @@ function App() {
               <IdeaStudioView
                 state={ideaStudio}
                 setState={setIdeaStudio}
+                workspaceId={IDEA_STUDIO_WORKSPACE_ID}
                 venue={selected.name}
                 evidence={evidence}
                 currentIdea={idea}
