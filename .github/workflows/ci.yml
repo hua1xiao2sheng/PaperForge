@@ -27,3 +27,5 @@ jobs:
           python-version: "3.12"
       - name: Check backend syntax
         run: python -m py_compile backend/main.py backend/idea_studio.py backend/state_store.py
+      - name: Test Idea Studio state
+        run: python -m unittest backend.test_state_store
