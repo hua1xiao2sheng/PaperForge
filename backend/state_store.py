@@ -126,7 +126,13 @@ class IdeaStudioStateStore:
                 base["brief"] = {**empty_state()["brief"], **payload["brief"]}
         return base
 
-    def put(self, workspace_id: str, state: dict[str, Any]) -> dict[str, Any]:
+    def put(
+        self,
+        workspace_id: str,
+        state: dict[str, Any],
+        *,
+        merge: bool = True,
+    ) -> dict[str, Any]:
         with self._lock, self._connect() as conn:
             row = conn.execute(
                 "SELECT payload FROM idea_studio_state WHERE workspace_id = ?",
@@ -140,7 +146,7 @@ class IdeaStudioStateStore:
                         current = parsed
                 except json.JSONDecodeError:
                     pass
-            normalized = merge_state(current, state)
+            normalized = merge_state(current if merge else empty_state(), state)
             data = json.dumps(normalized, ensure_ascii=False)
             conn.execute(
                 """
