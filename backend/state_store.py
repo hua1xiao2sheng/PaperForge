@@ -140,6 +140,7 @@ def apply_workflow_result(
                         "id": f"remote-user-{len(messages) + 1}",
                         "role": "user",
                         "content": instruction,
+                        "createdAt": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
                     }
                 )
         assistant = result.get("assistantMessage")
@@ -149,6 +150,7 @@ def apply_workflow_result(
                     "id": f"remote-assistant-{len(messages) + 1}",
                     "role": "assistant",
                     "content": assistant,
+                    "createdAt": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
                 }
             )
         next_state["messages"] = messages[-100:]
