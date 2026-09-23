@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
 from typing import Any
+from uuid import uuid4
 
 
 def empty_state() -> dict[str, Any]:
@@ -25,6 +26,58 @@ def empty_state() -> dict[str, Any]:
         "searchQueries": [],
         "decision": None,
     }
+
+
+def _merge_by_id(
+    current: list[dict[str, Any]],
+    incoming: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    ordered: list[dict[str, Any]] = []
+    positions: dict[str, int] = {}
+    for item in current:
+        if not isinstance(item, dict):
+            continue
+        item_id = str(item.get("id") or "")
+        if item_id:
+            positions[item_id] = len(ordered)
+        ordered.append(item)
+    for item in incoming:
+        if not isinstance(item, dict):
+            continue
+        item_id = str(item.get("id") or "")
+        if item_id and item_id in positions:
+            ordered[positions[item_id]] = item
+        else:
+            if item_id:
+                positions[item_id] = len(ordered)
+            ordered.append(item)
+    return ordered
+
+
+def merge_state(current: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+    base = empty_state()
+    base.update(current if isinstance(current, dict) else {})
+    base["brief"] = {
+        **empty_state()["brief"],
+        **(current.get("brief") if isinstance(current.get("brief"), dict) else {}),
+    }
+
+    if not isinstance(incoming, dict):
+        return base
+
+    if isinstance(incoming.get("brief"), dict):
+        base["brief"].update(incoming["brief"])
+
+    for key in ("messages", "candidates", "critiques", "findings"):
+        if isinstance(incoming.get(key), list):
+            base[key] = _merge_by_id(base.get(key) or [], incoming[key])
+
+    if isinstance(incoming.get("searchQueries"), list):
+        base["searchQueries"] = incoming["searchQueries"]
+    if "decision" in incoming and incoming.get("decision") is not None:
+        base["decision"] = incoming["decision"]
+
+    return base
 
 
 class IdeaStudioStateStore:
@@ -74,12 +127,21 @@ class IdeaStudioStateStore:
         return base
 
     def put(self, workspace_id: str, state: dict[str, Any]) -> dict[str, Any]:
-        normalized = empty_state()
-        normalized.update(state if isinstance(state, dict) else {})
-        if isinstance(state.get("brief"), dict):
-            normalized["brief"] = {**empty_state()["brief"], **state["brief"]}
-        data = json.dumps(normalized, ensure_ascii=False)
         with self._lock, self._connect() as conn:
+            row = conn.execute(
+                "SELECT payload FROM idea_studio_state WHERE workspace_id = ?",
+                (workspace_id,),
+            ).fetchone()
+            current = empty_state()
+            if row:
+                try:
+                    parsed = json.loads(row["payload"])
+                    if isinstance(parsed, dict):
+                        current = parsed
+                except json.JSONDecodeError:
+                    pass
+            normalized = merge_state(current, state)
+            data = json.dumps(normalized, ensure_ascii=False)
             conn.execute(
                 """
                 INSERT INTO idea_studio_state(workspace_id, payload, updated_at)
@@ -138,7 +200,7 @@ def apply_workflow_result(
             if not messages or messages[-1].get("content") != instruction:
                 messages.append(
                     {
-                        "id": f"remote-user-{len(messages) + 1}",
+                        "id": f"remote-user-{uuid4().hex}",
                         "role": "user",
                         "content": instruction,
                         "createdAt": datetime.now(timezone.utc).isoformat(),
@@ -148,7 +210,7 @@ def apply_workflow_result(
         if isinstance(assistant, str) and assistant.strip():
             messages.append(
                 {
-                    "id": f"remote-assistant-{len(messages) + 1}",
+                    "id": f"remote-assistant-{uuid4().hex}",
                     "role": "assistant",
                     "content": assistant,
                     "createdAt": datetime.now(timezone.utc).isoformat(),
