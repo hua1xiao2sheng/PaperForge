@@ -77,6 +77,9 @@ export function IdeaStudioView(props: {
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
   const [findingDraft, setFindingDraft] = useState('')
+  const [findingKind, setFindingKind] = useState<ResearchFinding['kind']>('observation')
+  const [findingEvidence, setFindingEvidence] = useState('')
+  const [findingConditions, setFindingConditions] = useState('')
 
   const selectedCandidate = useMemo(() => {
     const id = props.state.decision?.candidateId
@@ -271,15 +274,17 @@ export function IdeaStudioView(props: {
     if (!statement) return
     const finding: ResearchFinding = {
       id: 'finding-' + Date.now(),
-      kind: 'observation',
+      kind: findingKind,
       statement,
-      evidence: '',
-      conditions: '',
+      evidence: findingEvidence.trim(),
+      conditions: findingConditions.trim(),
       source: 'Human / manual',
       createdAt: nowIso(),
     }
     props.setState((prev) => ({ ...prev, findings: [finding, ...prev.findings] }))
     setFindingDraft('')
+    setFindingEvidence('')
+    setFindingConditions('')
   }
 
   return (
@@ -411,6 +416,16 @@ export function IdeaStudioView(props: {
               <div className="controller-action">{actionLabels[props.state.decision.action]}</div>
               <p>{props.state.decision.rationale}</p>
               {props.state.decision.question && <div><strong>Question:</strong> {props.state.decision.question}</div>}
+              {props.state.decision.searchQueries && props.state.decision.searchQueries.length > 0 && (
+                <div>
+                  <strong>Search next:</strong>
+                  <div className="query-chips">
+                    {props.state.decision.searchQueries.map((query) => (
+                      <button key={query} onClick={() => props.onOpenLiterature(query)}>{query}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {props.state.decision.experiment && <div><strong>Pilot:</strong> {props.state.decision.experiment}</div>}
               {props.state.decision.stopCondition && <div><strong>Stop condition:</strong> {props.state.decision.stopCondition}</div>}
             </div>
@@ -421,13 +436,30 @@ export function IdeaStudioView(props: {
         <section className="idea-studio-panel">
           <div className="card-title"><FlaskConical size={17} /> Findings Memory</div>
           <p className="panel-copy">Record outcomes with conditions. A model opinion is a hypothesis; an observed result can become a finding.</p>
-          <div className="finding-add">
-            <input value={findingDraft} onChange={(e) => setFindingDraft(e.target.value)} placeholder="e.g. Embedding mapping loses vendor-specific preconditions on 18/50 sampled actions." />
-            <button className="secondary-btn" onClick={addFinding}>Add</button>
+          <div className="finding-editor">
+            <div className="finding-editor-row">
+              <select value={findingKind} onChange={(e) => setFindingKind(e.target.value as ResearchFinding['kind'])}>
+                <option value="observation">Observation</option>
+                <option value="success">Success</option>
+                <option value="failure">Failure</option>
+                <option value="constraint">Constraint</option>
+              </select>
+              <input value={findingDraft} onChange={(e) => setFindingDraft(e.target.value)} placeholder="Observed result or constraint..." />
+            </div>
+            <input value={findingEvidence} onChange={(e) => setFindingEvidence(e.target.value)} placeholder="Evidence / run / sample / artifact supporting this finding" />
+            <input value={findingConditions} onChange={(e) => setFindingConditions(e.target.value)} placeholder="Conditions where this finding is known to apply" />
+            <button className="secondary-btn" onClick={addFinding}>Add finding</button>
           </div>
           <div className="findings-list">
             {props.state.findings.slice(0, 6).map((finding) => (
-              <div className="finding-row" key={finding.id}><span>{finding.kind}</span><p>{finding.statement}</p></div>
+              <div className="finding-row" key={finding.id}>
+                <span>{finding.kind}</span>
+                <div>
+                  <p>{finding.statement}</p>
+                  {finding.evidence && <small>Evidence: {finding.evidence}</small>}
+                  {finding.conditions && <small>Conditions: {finding.conditions}</small>}
+                </div>
+              </div>
             ))}
             {props.state.findings.length === 0 && <div className="studio-empty">No verified findings recorded yet.</div>}
           </div>
