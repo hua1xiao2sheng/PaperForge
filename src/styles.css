@@ -692,6 +692,19 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font-family: in
 .deadline-source:hover { color: #b3beff; }
 
 
+:root {
+  --text: #e8edf7;
+  --muted: #7f8da3;
+  --line: #202b40;
+  --panel: #0c1320;
+  --surface: #111827;
+  --brand: #7180ff;
+  --brand-soft: rgba(113,128,255,.14);
+  --success: #51d6ba;
+  --warning: #f2b84b;
+  --danger: #ff6b7a;
+}
+
 /* Idea Studio */
 .idea-studio {
   padding: 28px;
