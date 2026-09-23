@@ -224,7 +224,11 @@ async def workflow(req: WorkflowRequest):
                     payload,
                     data,
                 )
-                persisted_state = state_store.put(req.workspaceId, persisted_state)
+                persisted_state = state_store.put(
+                    req.workspaceId,
+                    persisted_state,
+                    merge=False,
+                )
         elif req.workflow == "idea.council":
             data = await council(req)
         elif req.workflow == "section.analyze":
