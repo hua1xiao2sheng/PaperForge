@@ -7,6 +7,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from idea_studio import handle_idea_studio
+
 app = FastAPI(title="PaperForge AI Gateway", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
@@ -26,6 +28,12 @@ class WorkflowRequest(BaseModel):
     draft: str | None = None
     evidence: list[dict[str, Any]] | None = None
     instruction: str | None = None
+    researchBrief: dict[str, Any] | None = None
+    candidates: list[dict[str, Any]] | None = None
+    candidate: dict[str, Any] | None = None
+    critiques: list[dict[str, Any]] | None = None
+    findings: list[dict[str, Any]] | None = None
+    messages: list[dict[str, Any]] | None = None
 
 ROLE_PROMPTS = {
     "AI Scientist": "Focus on falsifiable novelty, feasibility, experimental design, baselines and failure modes.",
@@ -171,7 +179,9 @@ async def health():
 async def workflow(req: WorkflowRequest):
     try:
         provider, model, _, _ = provider_config()
-        if req.workflow == "idea.council":
+        if req.workflow in {"idea.discover", "idea.critic", "idea.decide", "idea.refine"}:
+            data = await handle_idea_studio(req.workflow, req.model_dump(), chat)
+        elif req.workflow == "idea.council":
             data = await council(req)
         elif req.workflow == "section.analyze":
             data = await section_analyze(req)
