@@ -543,7 +543,10 @@ function App() {
                 evidence={evidence}
                 currentIdea={idea}
                 onAdopt={(candidate) => setIdea((prev) => candidateToIdeaSpec(candidate, prev))}
-                onOpenLiterature={() => setView('Literature')}
+                onOpenLiterature={(searchQuery) => {
+                  if (searchQuery) setLitQuery(searchQuery)
+                  setView('Literature')
+                }}
               />
               <div className="ideaspec-separator">
                 <div><strong>Adopted IdeaSpec</strong><span>Formalize a selected candidate before writing and submission.</span></div>
