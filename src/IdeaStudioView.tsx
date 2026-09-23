@@ -67,6 +67,7 @@ function briefText(brief: ResearchBrief) {
 export function IdeaStudioView(props: {
   state: IdeaStudioState
   setState: (next: IdeaStudioState | ((prev: IdeaStudioState) => IdeaStudioState)) => void
+  workspaceId: string
   venue: string
   evidence: EvidenceItem[]
   currentIdea: IdeaSpec
@@ -106,6 +107,7 @@ export function IdeaStudioView(props: {
     try {
       const remote = await callPaperForgeAI<IdeaDiscoveryResult>({
         workflow: 'idea.discover',
+        workspaceId: props.workspaceId,
         venue: props.venue,
         ideaSpec: props.currentIdea,
         evidence: props.evidence,
@@ -158,6 +160,7 @@ export function IdeaStudioView(props: {
     try {
       const remote = await callPaperForgeAI<IdeaCritiqueResult>({
         workflow: 'idea.critic',
+        workspaceId: props.workspaceId,
         venue: props.venue,
         ideaSpec: props.currentIdea,
         evidence: props.evidence,
@@ -192,6 +195,7 @@ export function IdeaStudioView(props: {
     try {
       const remote = await callPaperForgeAI<IdeaDecisionResult>({
         workflow: 'idea.decide',
+        workspaceId: props.workspaceId,
         venue: props.venue,
         ideaSpec: props.currentIdea,
         evidence: props.evidence,
@@ -220,6 +224,7 @@ export function IdeaStudioView(props: {
     try {
       const remote = await callPaperForgeAI<IdeaRefineResult>({
         workflow: 'idea.refine',
+        workspaceId: props.workspaceId,
         venue: props.venue,
         ideaSpec: props.currentIdea,
         evidence: props.evidence,
