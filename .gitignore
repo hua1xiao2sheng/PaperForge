@@ -4,3 +4,6 @@ dist
 .env.*
 !.env.example
 .DS_Store
+backend/paperforge-state.sqlite3
+backend/paperforge-state.sqlite3-shm
+backend/paperforge-state.sqlite3-wal
