@@ -9,10 +9,13 @@ from pydantic import BaseModel
 
 try:
     from .idea_studio import handle_idea_studio
+    from .state_store import IdeaStudioStateStore, apply_workflow_result, empty_state
 except ImportError:
     from idea_studio import handle_idea_studio
+    from state_store import IdeaStudioStateStore, apply_workflow_result, empty_state
 
-app = FastAPI(title="PaperForge AI Gateway", version="0.1.0")
+app = FastAPI(title="PaperForge AI Gateway", version="0.2.0")
+state_store = IdeaStudioStateStore()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("PAPERFORGE_FRONTEND_ORIGIN", "http://localhost:5173")],
@@ -26,6 +29,7 @@ Provider = Literal["openai", "deepseek", "openrouter"]
 class WorkflowRequest(BaseModel):
     workflow: str
     venue: str
+    workspaceId: str | None = None
     section: str | None = None
     ideaSpec: dict[str, Any] | None = None
     draft: str | None = None
@@ -37,6 +41,10 @@ class WorkflowRequest(BaseModel):
     critiques: list[dict[str, Any]] | None = None
     findings: list[dict[str, Any]] | None = None
     messages: list[dict[str, Any]] | None = None
+
+
+class IdeaStudioStateRequest(BaseModel):
+    state: dict[str, Any]
 
 ROLE_PROMPTS = {
     "AI Scientist": "Focus on falsifiable novelty, feasibility, experimental design, baselines and failure modes.",
@@ -176,14 +184,47 @@ async def review_paper(req: WorkflowRequest) -> list[dict[str, Any]]:
 
 @app.get("/health")
 async def health():
-    return {"ok": True, "service": "paperforge-ai-gateway"}
+    return {"ok": True, "service": "paperforge-ai-gateway", "version": "0.2.0"}
+
+
+@app.get("/v1/idea-studio/{workspace_id}")
+async def get_idea_studio_state(workspace_id: str):
+    if not workspace_id.strip():
+        raise HTTPException(400, "workspace_id must be non-empty")
+    return {"ok": True, "workspaceId": workspace_id, "state": state_store.get(workspace_id)}
+
+
+@app.put("/v1/idea-studio/{workspace_id}")
+async def put_idea_studio_state(workspace_id: str, req: IdeaStudioStateRequest):
+    if not workspace_id.strip():
+        raise HTTPException(400, "workspace_id must be non-empty")
+    state = state_store.put(workspace_id, req.state)
+    return {"ok": True, "workspaceId": workspace_id, "state": state}
 
 @app.post("/v1/workflow")
 async def workflow(req: WorkflowRequest):
     try:
         provider, model, _, _ = provider_config()
         if req.workflow in {"idea.discover", "idea.critic", "idea.decide", "idea.refine"}:
-            data = await handle_idea_studio(req.workflow, req.model_dump(), chat)
+            payload = req.model_dump()
+            previous_state = empty_state()
+            if req.workspaceId:
+                previous_state = state_store.get(req.workspaceId)
+                if payload.get("researchBrief") is None:
+                    payload["researchBrief"] = previous_state.get("brief")
+                for key in ("candidates", "critiques", "findings", "messages"):
+                    if payload.get(key) is None:
+                        payload[key] = previous_state.get(key)
+            data = await handle_idea_studio(req.workflow, payload, chat)
+            persisted_state = None
+            if req.workspaceId:
+                persisted_state = apply_workflow_result(
+                    previous_state,
+                    req.workflow,
+                    payload,
+                    data,
+                )
+                persisted_state = state_store.put(req.workspaceId, persisted_state)
         elif req.workflow == "idea.council":
             data = await council(req)
         elif req.workflow == "section.analyze":
@@ -192,7 +233,11 @@ async def workflow(req: WorkflowRequest):
             data = await review_paper(req)
         else:
             raise HTTPException(400, f"Workflow not implemented: {req.workflow}")
-        return {"ok": True, "provider": provider, "model": model, "data": data}
+        response = {"ok": True, "provider": provider, "model": model, "data": data}
+        if req.workflow in {"idea.discover", "idea.critic", "idea.decide", "idea.refine"} and req.workspaceId:
+            response["workspaceId"] = req.workspaceId
+            response["state"] = persisted_state
+        return response
     except HTTPException:
         raise
     except httpx.HTTPStatusError as exc:
