@@ -1,6 +1,10 @@
 export type AIWorkflow =
   | 'idea.analyze'
   | 'idea.council'
+  | 'idea.discover'
+  | 'idea.critic'
+  | 'idea.decide'
+  | 'idea.refine'
   | 'literature.plan'
   | 'literature.synthesize'
   | 'section.analyze'
@@ -16,6 +20,12 @@ export interface AIRequest {
   draft?: string
   evidence?: unknown[]
   instruction?: string
+  researchBrief?: unknown
+  candidates?: unknown[]
+  candidate?: unknown
+  critiques?: unknown[]
+  findings?: unknown[]
+  messages?: unknown[]
 }
 
 export interface AIResponse<T = unknown> {
