@@ -26,6 +26,7 @@ export interface AIRequest {
   critiques?: unknown[]
   findings?: unknown[]
   messages?: unknown[]
+  workspaceId?: string
 }
 
 export interface AIResponse<T = unknown> {
@@ -34,6 +35,8 @@ export interface AIResponse<T = unknown> {
   error?: string
   provider?: string
   model?: string
+  workspaceId?: string
+  state?: unknown
 }
 
 /**
@@ -58,5 +61,44 @@ export async function callPaperForgeAI<T>(payload: AIRequest): Promise<AIRespons
     return await response.json() as AIResponse<T>
   } catch (error) {
     return { ok:false, error:error instanceof Error ? error.message : 'Unknown AI backend error' }
+  }
+}
+
+
+function aiBackendBase(): string | null {
+  const raw = import.meta.env.VITE_AI_BACKEND_URL as string | undefined
+  return raw ? raw.replace(/\/$/, '') : null
+}
+
+export async function loadPaperForgeIdeaStudioState<T = unknown>(
+  workspaceId = 'default',
+): Promise<T | null> {
+  const base = aiBackendBase()
+  if (!base) return null
+  try {
+    const response = await fetch(base + '/v1/idea-studio/' + encodeURIComponent(workspaceId))
+    if (!response.ok) return null
+    const payload = await response.json() as { ok?: boolean; state?: T }
+    return payload.ok && payload.state ? payload.state : null
+  } catch {
+    return null
+  }
+}
+
+export async function savePaperForgeIdeaStudioState(
+  state: unknown,
+  workspaceId = 'default',
+): Promise<boolean> {
+  const base = aiBackendBase()
+  if (!base) return false
+  try {
+    const response = await fetch(base + '/v1/idea-studio/' + encodeURIComponent(workspaceId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state }),
+    })
+    return response.ok
+  } catch {
+    return false
   }
 }
