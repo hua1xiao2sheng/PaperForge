@@ -71,7 +71,7 @@ export function IdeaStudioView(props: {
   evidence: EvidenceItem[]
   currentIdea: IdeaSpec
   onAdopt: (candidate: IdeaCandidate) => void
-  onOpenLiterature: () => void
+  onOpenLiterature: (query?: string) => void
 }) {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState('')
@@ -342,7 +342,7 @@ export function IdeaStudioView(props: {
         <section className="idea-studio-panel">
           <div className="card-title"><Search size={17} /> Evidence queries suggested by the discovery loop</div>
           <div className="query-chips">
-            {props.state.searchQueries.map((query) => <button key={query} onClick={props.onOpenLiterature}>{query}</button>)}
+            {props.state.searchQueries.map((query) => <button key={query} onClick={() => props.onOpenLiterature(query)}>{query}</button>)}
           </div>
         </section>
       )}
