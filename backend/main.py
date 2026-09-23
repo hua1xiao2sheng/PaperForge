@@ -7,7 +7,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from idea_studio import handle_idea_studio
+try:
+    from .idea_studio import handle_idea_studio
+except ImportError:
+    from idea_studio import handle_idea_studio
 
 app = FastAPI(title="PaperForge AI Gateway", version="0.1.0")
 app.add_middleware(
