@@ -259,7 +259,7 @@ export function IdeaStudioView(props: {
     props.setState((prev) => ({
       ...prev,
       candidates: prev.candidates.map((item) =>
-        item.id === candidate.id ? { ...item, status: 'adopted' } : item,
+        item.id === candidate.id ? { ...item, status: 'adopted' as const } : item,
       ),
       decision: {
         action: 'adopt',
@@ -337,7 +337,7 @@ export function IdeaStudioView(props: {
             <button className="primary-btn" disabled={busy === 'discover'} onClick={runDiscovery}>
               {busy === 'discover' ? <Loader2 className="spin" size={16} /> : <Sparkles size={16} />} Discuss & discover
             </button>
-            <button className="secondary-btn" onClick={props.onOpenLiterature}><Search size={16} /> Open evidence workspace</button>
+            <button className="secondary-btn" onClick={() => props.onOpenLiterature()}><Search size={16} /> Open evidence workspace</button>
           </div>
           {error && <div className="inline-warning"><AlertTriangle size={15} /> {error}</div>}
         </section>
