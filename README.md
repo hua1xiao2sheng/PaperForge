@@ -8,8 +8,14 @@ PaperForge is an end-to-end research-paper workspace for computer science. It co
 
 ```text
 Choose venue
-→ Idea Lab
-→ Innovation Council
+→ Idea Studio discussion
+→ Research Brief (assets + constraints + prior work)
+→ ARIS-style candidate discovery
+→ Evidence grounding / closest-work checks
+→ Independent Critic Council
+→ Research Controller
+   ↳ ask user / search more / revise / bounded pilot / adopt / stop
+→ Findings Memory feeds the next discovery round
 → Adopt IdeaSpec
 → Literature / Evidence
 → Write section by section
@@ -19,6 +25,8 @@ Choose venue
 → Submission Gate
 → Export LaTeX
 ```
+
+The Idea Studio does not claim to outperform ARIS. ARIS-style discovery is the ideation backbone; PaperForge adds persistent human discussion, a shared research-state contract, independent critics, next-action control, and Findings Memory around it. See `docs/idea-studio.md`.
 
 ## What is implemented
 
