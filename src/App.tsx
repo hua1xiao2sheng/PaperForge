@@ -74,6 +74,12 @@ import {
   type AIConfig,
   type ProviderId,
 } from './lib/ai'
+import { IdeaStudioView } from './IdeaStudioView'
+import {
+  candidateToIdeaSpec,
+  emptyIdeaStudioState,
+  type IdeaStudioState,
+} from './lib/ideaStudio'
 
 type DraftMap = Record<string, string>
 type ManualChecks = Record<string, boolean>
@@ -83,6 +89,7 @@ const STORAGE_KEY = 'paperforge:workspace:v3'
 interface StoredWorkspace {
   selectedId?: string
   idea?: IdeaSpec
+  ideaStudio?: IdeaStudioState
   drafts?: DraftMap
   evidence?: EvidenceItem[]
   section?: string
@@ -125,6 +132,19 @@ function App() {
   const [section, setSection] = useState(initial.section || 'Introduction')
   const [drafts, setDrafts] = useState<DraftMap>(initial.drafts || {})
   const [idea, setIdea] = useState<IdeaSpec>({ ...emptyIdeaSpec, ...(initial.idea || {}) })
+  const [ideaStudio, setIdeaStudio] = useState<IdeaStudioState>(() => ({
+    ...emptyIdeaStudioState,
+    ...(initial.ideaStudio || {}),
+    brief: {
+      ...emptyIdeaStudioState.brief,
+      ...(initial.ideaStudio?.brief || {}),
+    },
+    messages: initial.ideaStudio?.messages || [],
+    candidates: initial.ideaStudio?.candidates || [],
+    critiques: initial.ideaStudio?.critiques || [],
+    findings: initial.ideaStudio?.findings || [],
+    searchQueries: initial.ideaStudio?.searchQueries || [],
+  }))
   const [evidence, setEvidence] = useState<EvidenceItem[]>(initial.evidence || [])
   const [manualChecks, setManualChecks] = useState<ManualChecks>(initial.manualChecks || {})
 
@@ -172,9 +192,9 @@ function App() {
   }, [selectedId, outline, section])
 
   useEffect(() => {
-    const state: StoredWorkspace = { selectedId, idea, drafts, evidence, section, manualChecks }
+    const state: StoredWorkspace = { selectedId, idea, ideaStudio, drafts, evidence, section, manualChecks }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  }, [selectedId, idea, drafts, evidence, section, manualChecks])
+  }, [selectedId, idea, ideaStudio, drafts, evidence, section, manualChecks])
 
   const draftedSections = outline.filter((name) => (drafts[selected.id + ':' + name] || '').trim().length > 80).length
 
@@ -196,6 +216,7 @@ function App() {
       exportedAt: new Date().toISOString(),
       conference: selected,
       idea,
+      ideaStudio,
       evidence,
       outline,
       drafts: Object.fromEntries(outline.map((name) => [name, drafts[selected.id + ':' + name] || ''])),
@@ -514,18 +535,33 @@ function App() {
           )}
 
           {view === 'Idea Lab' && (
-            <IdeaLabView
-              idea={idea}
-              updateIdea={updateIdea}
-              completeness={completeness}
-              runIdeaCoach={runIdeaCoach}
-              runInnovationCouncil={runInnovationCouncil}
-              councilBusy={councilBusy}
-              opinions={councilOpinions}
-              consensus={consensus}
-              aiOutput={aiOutput}
-              aiBusy={aiBusy}
-            />
+            <>
+              <IdeaStudioView
+                state={ideaStudio}
+                setState={setIdeaStudio}
+                venue={selected.name}
+                evidence={evidence}
+                currentIdea={idea}
+                onAdopt={(candidate) => setIdea((prev) => candidateToIdeaSpec(candidate, prev))}
+                onOpenLiterature={() => setView('Literature')}
+              />
+              <div className="ideaspec-separator">
+                <div><strong>Adopted IdeaSpec</strong><span>Formalize a selected candidate before writing and submission.</span></div>
+                <ChevronRight size={18} />
+              </div>
+              <IdeaLabView
+                idea={idea}
+                updateIdea={updateIdea}
+                completeness={completeness}
+                runIdeaCoach={runIdeaCoach}
+                runInnovationCouncil={runInnovationCouncil}
+                councilBusy={councilBusy}
+                opinions={councilOpinions}
+                consensus={consensus}
+                aiOutput={aiOutput}
+                aiBusy={aiBusy}
+              />
+            </>
           )}
 
           {view === 'Literature' && (
@@ -760,9 +796,9 @@ function IdeaLabView(props: {
     <div className="page">
       <div className="page-title-row">
         <div>
-          <div className="eyebrow">IDEA LAB</div>
-          <h1>Build a defensible research idea</h1>
-          <p>Independent ideation first; evidence and adversarial review before convergence.</p>
+          <div className="eyebrow">ADOPTED IDEASPEC</div>
+          <h1>Formalize the selected research route</h1>
+          <p>The Idea Studio above discovers and challenges candidates. This contract freezes the route you choose for writing, evidence, and experiments.</p>
         </div>
         <div className="score-ring"><strong>{props.completeness}%</strong><span>IdeaSpec</span></div>
       </div>
